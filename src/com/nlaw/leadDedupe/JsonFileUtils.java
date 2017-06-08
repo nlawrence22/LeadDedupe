@@ -1,6 +1,7 @@
 package com.nlaw.leadDedupe;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -19,7 +20,7 @@ public interface JsonFileUtils {
 
     File createOutputFile(String outputFilePath);
 
-    List<Lead> parseJson(File inputFile);
+    List<Lead> parseJson(File inputFile) throws IOException;
 
     void writeOutputFile();
 }
