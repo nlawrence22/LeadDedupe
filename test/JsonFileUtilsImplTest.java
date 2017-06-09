@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *  Tests the JsonFileUtilsImpl class methods
@@ -28,7 +30,7 @@ public class JsonFileUtilsImplTest {
 
     @Rule
     public TemporaryFolder folder = new TemporaryFolder(
-            new File(System.getProperty("user.dir")));
+            new File(workingdir));
 
     @Before
     public void setUp(){
@@ -36,10 +38,10 @@ public class JsonFileUtilsImplTest {
     }
 
     @Test
-    public void getInputFileReturnsValidPath() throws IOException {
-        File temp = folder.newFile("test.txt");
+    public void getInputFileReturnsCorrectFile() throws IOException {
+        File temp = folder.newFile("someInput.json");
         assertEquals(temp, fileUtils.getInputFile(folder.getRoot().getName() +
-                System.getProperty("file.separator") + "test.txt"));
+                fileSep + "someInput.json"));
     }
 
     @Test
