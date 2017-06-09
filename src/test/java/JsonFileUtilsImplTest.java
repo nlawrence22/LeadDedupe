@@ -26,7 +26,8 @@ public class JsonFileUtilsImplTest {
     private String workingdir = System.getProperty("user.dir");
     private String fileSep = System.getProperty("file.separator");
     private JsonFileUtilsImpl fileUtils;
-    private String testResourcePath = "testResources" + fileSep;
+    private String testResourcePath = "src" + fileSep + "test" + fileSep +
+            "resources" + fileSep;
 
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
@@ -55,8 +56,7 @@ public class JsonFileUtilsImplTest {
 
     @Test
     public void parseJsonReturnsCorrectNumOfItems() throws IOException {
-        String testJsonPath = workingdir + fileSep + "testResources" +
-                fileSep + "leads.json";
+        String testJsonPath = testResourcePath + "leads.json";
         File testJsonFile = new File(testJsonPath);
 
         List<Lead> parseOutput = fileUtils.parseJson(testJsonFile);
@@ -66,8 +66,7 @@ public class JsonFileUtilsImplTest {
 
     @Test
     public void parseJsonReturnsCorrectData() throws IOException{
-        String testJsonPath = workingdir + fileSep + "testResources" +
-                fileSep + "leads.json";
+        String testJsonPath = testResourcePath + "leads.json";
         File testJsonFile = new File(testJsonPath);
 
         List<Lead> parseOutput = fileUtils.parseJson(testJsonFile);

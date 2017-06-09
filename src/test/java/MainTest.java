@@ -22,7 +22,8 @@ import static org.junit.Assert.assertEquals;
 public class MainTest {
     private String workingdir = System.getProperty("user.dir");
     private String fileSep = System.getProperty("file.separator");
-    private String testResourcePath = "testResources" + fileSep;
+    private String testResourcePath = "src" + fileSep + "test" + fileSep
+            + "resources" + fileSep;
 
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
