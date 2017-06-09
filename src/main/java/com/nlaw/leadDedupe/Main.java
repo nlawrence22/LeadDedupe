@@ -19,11 +19,11 @@ import java.util.List;
  *     duplicate values do not constitute a duplicate record.
  *  3. If dates are identical, use the record provided last in the list.
  *
- *  The command line program expects two arguments:
+ *  The command line program expects one argument, and up to a second,
+ *  optional argument:
  *
- *  1. The input filepath
- *  2. The output filepath (optional)
- *
+ *  1. The input filename relative to the working directory of the program
+ *  2. The output filepath relative to the working directory of the program (optional)
  *
  *  The output argument is optional.  If the output filepath is omitted,
  *  output will be written to output.json in the parent directory of the
@@ -33,14 +33,16 @@ import java.util.List;
  *
  */
 public class Main {
+    public static String usage = "Usage:\n" +
+            "java -jar leadDedupe-[version].jar input_filename [output_filename]";
 
     public static void main(String[] args) {
 	    // Check arguments before doing anything else no need to waste memory
         // or time if we've got bogus input
 
         if (args.length <= 0 || args.length > 2 || args[0] == null){
-            System.out.println("Please provide 1 or 2 arguments:");
-            System.out.println("/path/to/input.json /path/to/output.json");
+            System.out.println("Please provide 1 or 2 arguments");
+            System.out.println(usage);
             System.exit(1);
         }
 
