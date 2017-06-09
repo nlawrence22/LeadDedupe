@@ -84,4 +84,44 @@ public class JsonFileUtilsImplTest {
         assertEquals("123 Street St", address);
         assertEquals("2014-05-07T17:30:20+00:00", entryDate);
     }
+
+    @Test
+    public void testCreateOutputFileGivesCorrectPathForCreatedFile() throws IOException{
+        String path = folder.getRoot().getName() + fileSep + "someOutput.json";
+        assertEquals(workingdir + fileSep + path, fileUtils.createOutputFile(path).toString());
+    }
+
+    @Test
+    public void testCreateOutputFileGivesDefaultPathForNullFileName(){
+        String path = workingdir + fileSep + "output.json";
+        assertEquals(path, fileUtils.createOutputFile(null).getPath().toString());
+    }
+
+    @Test
+    public void testCreateOutputFileCreatesFileOnFileSystem() throws IOException{
+        String path = folder.getRoot().getName() + fileSep + "newOutput.json";
+        File output = new File(path);
+
+        if (output.exists()){
+            output.delete();
+        }
+
+        assertFalse(output.exists());
+        fileUtils.createOutputFile(path);
+        assertTrue(output.exists());
+    }
+
+    @Test
+    public void testCreateOutputFileCreatesDefaultFileOnFileSystemWithNullFilename(){
+        String path = workingdir + fileSep + "output.json";
+        File output = new File(path);
+
+        if (output.exists()){
+            output.delete();
+        }
+
+        assertFalse(output.exists());
+        fileUtils.createOutputFile(null);
+        assertTrue(output.exists());
+    }
 }
