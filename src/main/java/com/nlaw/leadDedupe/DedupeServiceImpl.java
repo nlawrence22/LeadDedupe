@@ -1,5 +1,8 @@
 package com.nlaw.leadDedupe;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -29,6 +32,8 @@ import java.util.Map;
  *
  */
 public class DedupeServiceImpl implements DedupeService {
+
+    public static final Logger logger = LogManager.getLogger(DedupeServiceImpl.class.getName());
 
     private File inputJson;
 
@@ -89,6 +94,7 @@ public class DedupeServiceImpl implements DedupeService {
 
         // Iterate through each item, and merge it into the output list
         for (Lead lead : originalLeads){
+            logger.debug("Processing new record...");
             String email = lead.getEmail();
             String id = lead.get_id();
 
@@ -145,7 +151,7 @@ public class DedupeServiceImpl implements DedupeService {
 
         indexMap.put(email, arrayIndex);
         emailMap.put(id,email);
-        //TODO: Log Changes
+        logger.debug("Adding Record: \n" + "  " + lead.toString());
         outputLeads.add(arrayIndex, lead);
     }
 
@@ -175,7 +181,8 @@ public class DedupeServiceImpl implements DedupeService {
            then we update the same as if the date is newer, aka after the
            date currently mapped. */
         if (leadDate.isAfter(origDate) || leadDate.isEqual(origDate)) {
-            //TODO: Log changes
+
+            logChanges(lead, originalRecord);
             outputLeads.remove(itemIndex);
 
             String originalRecordEmail = originalRecord.getEmail();
@@ -271,6 +278,10 @@ public class DedupeServiceImpl implements DedupeService {
         int idMatchFileLocation = originalLeads.indexOf(idMatchRecord);
         int emailMatchFileLocation = originalLeads.indexOf(emailMatchRecord);
 
+        logger.info("3-way collision!\n Current record:\n  " + lead.toString()
+                + "\n Existing record with same email:\n  " + emailMatchRecord.toString()
+                + "\n Exisiting record with same id:\n  " + idMatchRecord.toString());
+
         // if the lead date is after both dates or is equal to both dates then
         // keep the new record only.
         if ((leadDate.isAfter(idMatchDate) && leadDate.isAfter(emailMatchDate)) ||
@@ -292,26 +303,20 @@ public class DedupeServiceImpl implements DedupeService {
             // update all the indices because we've completely jacked our map
             updateIndices(0);
 
-            //TODO: Log changes
-
             return;
 
         } else if (leadDate.isAfter(idMatchDate) && leadDate.isBefore(emailMatchDate) ||
                 (leadDate.isAfter(emailMatchDate) && leadDate.isBefore(idMatchDate))){
             //if the lead date is in the middle
 
-                // idMatch is chronologically after email match making it last chronologically
-                // emailMatch < lead < idMatch
             if (idMatchDate.isAfter(emailMatchDate)){
+                // emailMatch < lead < idMatch
                 removeRecord(emailMatchIndex, emailMatchEmail, emailMatchID);
-                //TODO: log changes
-
                 updateIndices(idMatchIndex);
+
             } else {
                 // idMatch < lead < emailMatch
-               removeRecord(idMatchIndex, idMatchEmail, idMatchID);
-                //TODO: log changes
-
+                removeRecord(idMatchIndex, idMatchEmail, idMatchID);
                 updateIndices(emailMatchIndex);
             }
 
@@ -330,15 +335,12 @@ public class DedupeServiceImpl implements DedupeService {
                     (idMatchDate.isBefore(emailMatchDate) && idMatchFileLocation < emailMatchFileLocation)){
                 // remove the first chronological instance, because the middle collision occurred.
                 if (emailMatchDate.isBefore(idMatchDate)){
+
                     removeRecord(emailMatchIndex, emailMatchEmail, emailMatchID);
-
-                    //TODO: log changes
-
                     updateIndices(emailMatchIndex);
+
                 } else {
                     removeRecord(idMatchIndex, idMatchEmail, idMatchID);
-
-                    //TODO: log changes
                     updateIndices(idMatchIndex);
                 }
                 return;
@@ -362,8 +364,6 @@ public class DedupeServiceImpl implements DedupeService {
 
                 removeRecord(emailMatchIndex, emailMatchEmail, emailMatchID);
 
-                //TODO: log changes
-
                 // we've removed an item so all of the items from the original
                 // index onwards have shifted down one.  Items before the original
                 // index are unaffected.
@@ -373,11 +373,7 @@ public class DedupeServiceImpl implements DedupeService {
 
                 removeRecord(idMatchIndex, idMatchEmail, idMatchID);
 
-                //TODO: log changes
-
                 addNewRecord(lead, email, lead.get_id());
-
-                //TODO: log changes
 
                 // update all the indices because the map is jacked
                 updateIndices(0);
@@ -390,14 +386,9 @@ public class DedupeServiceImpl implements DedupeService {
 
                 if (emailMatchDate.isAfter(leadDate)){
                     removeRecord(idMatchIndex, idMatchEmail, idMatchID);
-
-                    //TODO: log changes
                     updateIndices(idMatchIndex);
                 } else {
                     removeRecord(emailMatchIndex, emailMatchEmail, emailMatchID);
-
-                    //TODO: log changes
-
                     updateIndices(emailMatchIndex);
                 }
                 return;
@@ -406,13 +397,9 @@ public class DedupeServiceImpl implements DedupeService {
                 // remove the first
                 if (emailMatchFileLocation < idMatchFileLocation){
                     removeRecord(emailMatchIndex, emailMatchEmail, emailMatchID);
-                    //TODO:log changes
-
                     updateIndices(emailMatchIndex);
                 } else {
                     removeRecord(idMatchIndex, idMatchEmail, idMatchID);
-
-                    //TODO: log changes
                     updateIndices(idMatchIndex);
                 }
                 return;
@@ -430,9 +417,11 @@ public class DedupeServiceImpl implements DedupeService {
      * @param id The id associated with the item removed from the list
      */
     private void removeRecord(int index, String email, String id){
+        Lead record = outputLeads.get(index);
         outputLeads.remove(index);
         indexMap.remove(email);
         emailMap.remove(id);
+        logger.debug("Removing Record: \n" + "  " + record.toString());
     }
 
     /**
@@ -460,5 +449,40 @@ public class DedupeServiceImpl implements DedupeService {
             indexMap.remove(email);
             indexMap.put(email, i);
         }
+    }
+
+    private void logChanges(Lead oldRecord, Lead newRecord){
+        String valueChangeString = "  %s changed -- Value From: \"%s\" --> " +
+                "Value To: \"%s\" \n";
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Merging one record:\n");
+        stringBuilder.append("  Old Record:\n  " + oldRecord.toString() + "\n");
+        stringBuilder.append("  New Record:\n  " + newRecord.toString() + "\n");
+
+        if (!oldRecord.get_id().equals(newRecord.get_id())){
+            stringBuilder.append(String.format(valueChangeString, "id",
+                    oldRecord.get_id(), newRecord.get_id()));
+        }
+        if (!oldRecord.getEmail().equals(newRecord.getEmail())){
+            stringBuilder.append(String.format(valueChangeString, "email",
+                    oldRecord.getEmail(), newRecord.getEmail()));
+        }
+        if (!oldRecord.getFirstName().equals(newRecord.getFirstName())){
+            stringBuilder.append(String.format(valueChangeString, "firstName",
+                    oldRecord.getFirstName(), newRecord.getFirstName()));
+        }
+        if (!oldRecord.getLastName().equals(newRecord.getLastName())){
+            stringBuilder.append(String.format(valueChangeString, "lastName",
+                    oldRecord.getLastName(), newRecord.getLastName()));
+        }
+        if (!oldRecord.getAddress().equals(newRecord.getAddress())){
+            stringBuilder.append(String.format(valueChangeString, "address",
+                    oldRecord.getAddress(), newRecord.getAddress()));
+        }
+        if (!oldRecord.getEntryDate().equals(newRecord.getEntryDate())){
+            stringBuilder.append(String.format(valueChangeString, "entryDate",
+                    oldRecord.getEntryDate(), newRecord.getEntryDate()));
+        }
+        logger.info(stringBuilder.toString());
     }
 }

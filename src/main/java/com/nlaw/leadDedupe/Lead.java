@@ -28,6 +28,14 @@ public class Lead {
         this.entryDate = entryDate;
     }
 
+    @Override
+    public String toString (){
+        return "{\n   id: " + get_id() + ",\n   email: " + getEmail() +
+                ",\n   firstName: " + getFirstName() + ",\n   lastName: " +
+                getLastName() + ",\n   address: " + getAddress() +
+                ",\n   entryDate: " + getEntryDate() + "\n  }";
+    }
+
     public String get_id() {
         return _id;
     }
