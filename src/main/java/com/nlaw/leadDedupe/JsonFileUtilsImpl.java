@@ -9,7 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by nlawrence on 6/7/17.
+ *
+ * Handles all file and JSON processing needs.
+ *
+ * Separate methods are provided to create and read/write files so that the
+ * program can attempt to create files first, and handle those exceptions
+ * before trying to operate on those files themselves (likely after some
+ * significant processing has occurred).
+ *
+ * @author nlawrence
+ *
  */
 public class JsonFileUtilsImpl implements JsonFileUtils {
     public static final String defaultOutputFileName = "output.json";
@@ -29,7 +38,6 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
 
             inputJson = new File(path);
         } catch (Exception e) {
-            //TODO: Log errors to separate file
             System.out.println("The provided input filename resulted in a null path, aborting");
             e.printStackTrace();
             System.exit(1);
@@ -51,15 +59,17 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
             outputJson = new File(path);
 
         } catch (NullPointerException e) {
-            //TODO: Log errors to separate file
-            System.out.println("No output filename was provided or the provided " +
-                    "filename resulted in a null filepath\n" +
+            // no need to bail here, just use a default filename if that fails,
+            // an exception will bubble up and the program will terminate
+            System.out.println("No output filename was provided or the " +
+                    "provided filename resulted in a null filepath\n" +
                     "Setting to default filename: " + defaultOutputFileName );
             outputJson = new File(defaultPath);
         }
 
         try{
             if (outputJson.exists()){
+                //we want clean output, so remove any existing file
                 outputJson.delete();
             }
             outputJson.createNewFile();
@@ -80,18 +90,23 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
         JsonReader jsonReader = new JsonReader(new FileReader(inputFile));
         Gson gson = new Gson();
 
+        //consume first curly brace {
         jsonReader.beginObject();
         while (jsonReader.hasNext()){
             String name = jsonReader.nextName();
+            //our leads are buried inside an array in a "leads" object
             if (name.equals("leads")){
+                //consume the first bracket [
                 jsonReader.beginArray();
                 while (jsonReader.hasNext()){
                     Lead lead = gson.fromJson(jsonReader, Lead.class);
                     leads.add(lead);
                 }
+                //consume closing bracket ]
                 jsonReader.endArray();
             }
         }
+        //consume closing curly brace }
         jsonReader.endObject();
         jsonReader.close();
         return leads;
@@ -103,6 +118,8 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
 
         writer.setIndent("  ");
         writer.beginObject();
+        // we need the same format, so we need to re-create the "leads" object
+        // and bury our leads inside an array in that object
         writer.name("leads");
         writer.beginArray();
         for (Lead lead:outputLeads) {

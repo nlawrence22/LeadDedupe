@@ -3,8 +3,7 @@ package com.nlaw.leadDedupe;
 /**
  *  Lead JavaBean
  *
- *  Leads in this context are contact records
- *  used in sales/marketing.
+ *  Leads in this context are contact records used in sales/marketing.
  *
  *  @author nlawrence
  *

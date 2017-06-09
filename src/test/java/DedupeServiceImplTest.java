@@ -17,6 +17,8 @@ import static org.junit.Assert.*;
  * examples of each possible three way collision situation we could
  * run into.
  *
+ * @author nlawrence
+ *
  */
 public class DedupeServiceImplTest {
     private String workingdir = System.getProperty("user.dir");

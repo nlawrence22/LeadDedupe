@@ -106,7 +106,7 @@ public class DedupeServiceImpl implements DedupeService {
                 addNewRecord(lead, email, id);
 
             } else if (idExists){
-                int itemIndex = indexMap.get(emailMap.get(id)); //IDs match automatically
+                int itemIndex = indexMap.get(emailMap.get(id)); //IDs match if we're here
                 Lead idMatchRecord = outputLeads.get(itemIndex);
                 boolean emailsMatch = lead.getEmail().equals(idMatchRecord.getEmail());
 

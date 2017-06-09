@@ -21,6 +21,8 @@ import static org.junit.Assert.assertTrue;
  *
  *  System Rules is used to handle system exit conditions, as the test would
  *  exit abnormally (and likely throw an exception) otherwise.
+ *
+ *  @author nlawrence
  */
 public class JsonFileUtilsImplTest {
     private String workingdir = System.getProperty("user.dir");

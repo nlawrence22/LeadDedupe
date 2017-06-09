@@ -18,6 +18,8 @@ import static org.junit.Assert.assertEquals;
  *
  *  Some logic that only exists in the main method needs to be tested.  We use
  *  the System Rules
+ *
+ *  @author nlawrence
  */
 public class MainTest {
     private String workingdir = System.getProperty("user.dir");
