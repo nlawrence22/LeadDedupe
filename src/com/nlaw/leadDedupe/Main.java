@@ -1,5 +1,9 @@
 package com.nlaw.leadDedupe;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 /**
  *  LeadDeduper
  *
@@ -31,11 +35,39 @@ package com.nlaw.leadDedupe;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
+	    // Check arguments before doing anything else no need to waste memory
+        // or time if we've got bogus input
+
         if (args.length <= 0 || args.length > 2 || args[0] == null){
             System.out.println("Please provide 1 or 2 arguments:");
             System.out.println("/path/to/input.json /path/to/output.json");
             System.exit(1);
         }
+
+        String inputPath;
+        String outputPath;
+
+        inputPath = args[0];
+        // don't try to assign an index out of bounds...
+        outputPath = args.length == 2 ? args[1] : null;
+
+        JsonFileUtilsImpl fileUtils = new JsonFileUtilsImpl();
+        // We should try to create the output file first, because we'll waste
+        // time if we do all the work and can't write the file at the end.
+        File outputFile = fileUtils.createOutputFile(outputPath);
+
+        DedupeService deduper = new DedupeServiceImpl();
+        List<Lead> outputLeads = deduper.deduplicateItems(inputPath);
+
+        try {
+            fileUtils.writeOutputFile(outputFile, outputLeads);
+        } catch (IOException e) {
+            System.out.println("Unable to write output file!");
+            e.printStackTrace();
+            System.out.println("Changes should be tracked in logs");
+            System.exit(1);
+        }
+
+        System.out.println("Done! Output file is at " + outputFile.getAbsolutePath().toString());
     }
 }
