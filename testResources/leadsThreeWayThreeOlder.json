@@ -1,0 +1,26 @@
+{"leads":[
+{
+"_id": "wabaj238238jdsnfsj23",
+"email": "bog@bar.com",
+"firstName":  "Fran",
+"lastName": "Jones",
+"address": "8803 Dark St",
+"entryDate": "2014-05-07T17:30:30+00:00"
+},
+{
+"_id": "sel045238jdsnfsj23",
+"email": "foo@bar.com",
+"firstName":  "John",
+"lastName": "Smith",
+"address": "123 Street St",
+"entryDate": "2014-05-07T17:30:30+00:00"
+},
+{
+"_id": "sel045238jdsnfsj23",
+"email": "bog@bar.com",
+"firstName":  "John",
+"lastName": "Smith",
+"address": "123 Street St",
+"entryDate": "2014-05-07T17:30:40+00:00"
+}]
+}
