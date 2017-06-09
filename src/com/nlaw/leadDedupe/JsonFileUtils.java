@@ -22,5 +22,5 @@ public interface JsonFileUtils {
 
     List<Lead> parseJson(File inputFile) throws IOException;
 
-    void writeOutputFile();
+    void writeOutputFile(File outputFile, List<Lead> outputLeads) throws IOException;
 }

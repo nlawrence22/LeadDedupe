@@ -8,6 +8,8 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -24,6 +26,7 @@ public class JsonFileUtilsImplTest {
     private String workingdir = System.getProperty("user.dir");
     private String fileSep = System.getProperty("file.separator");
     private JsonFileUtilsImpl fileUtils;
+    private String testResourcePath = "testResources" + fileSep;
 
     @Rule
     public final ExpectedSystemExit exit = ExpectedSystemExit.none();
@@ -123,5 +126,38 @@ public class JsonFileUtilsImplTest {
         assertFalse(output.exists());
         fileUtils.createOutputFile(null);
         assertTrue(output.exists());
+    }
+
+    @Test
+    public void testWriteOutputFileCreatesProperOutput() throws IOException {
+        String path = folder.getRoot().getName() + fileSep + "testOutput.json";
+        File outputFile = new File(path);
+        File expectedFile = new File(testResourcePath + "exampleOutput.json");
+
+        if (outputFile.exists()){
+            outputFile.delete();
+        }
+
+        Lead leadOne = new Lead("jkj238238jdsnfsj23", "bill@bar.com", "John",
+                "Smith", "888 Mayberry St", "2014-05-07T17:33:20+00:00");
+        Lead leadTwo = new Lead("belr28238jdsnfsj23", "mae@bar.com", "Tallulah",
+                "Smith", "123 Water St", "2014-05-07T17:33:20+00:00");
+        List<Lead> leads = new ArrayList<>();
+        leads.add(leadOne);
+        leads.add(leadTwo);
+
+        fileUtils.writeOutputFile(outputFile, leads);
+
+        List<String> expected = Files.readAllLines(expectedFile.toPath());
+        List<String> actual = Files.readAllLines(outputFile.toPath());
+
+        //verify we have the same number of lines
+        assertEquals(expected.size(), actual.size());
+
+        //then verify that each of those lines have the same content
+        for (int i = 0; i < expected.size(); i ++){
+            assertEquals(expected.get(i), actual.get(i));
+        }
+
     }
 }
