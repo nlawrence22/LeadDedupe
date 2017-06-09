@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
  *
  */
 public class DedupeServiceImplTest {
-    private String workingdir = System.getProperty("user.dir");
     private String fileSep = System.getProperty("file.separator");
     private String testResourcePath = "src" + fileSep + "test" + fileSep +
             "resources" + fileSep;
