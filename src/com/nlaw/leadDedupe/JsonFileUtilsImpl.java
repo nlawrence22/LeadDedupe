@@ -2,10 +2,9 @@ package com.nlaw.leadDedupe;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,7 +97,19 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
         return leads;
     }
 
-    public void writeOutputFile() {
+    public void writeOutputFile(File outputFile, List<Lead> outputLeads) throws IOException {
+        JsonWriter writer = new JsonWriter(new FileWriter(outputFile));
+        Gson gson = new Gson();
 
+        writer.setIndent("  ");
+        writer.beginObject();
+        writer.name("leads");
+        writer.beginArray();
+        for (Lead lead:outputLeads) {
+            gson.toJson(lead, Lead.class, writer);
+        }
+        writer.endArray();
+        writer.endObject();
+        writer.close();
     }
 }
