@@ -40,7 +40,39 @@ public class JsonFileUtilsImpl implements JsonFileUtils {
      }
 
     public File createOutputFile(String outputFilePath){
-        return null;
+        File outputJson;
+        String defaultPath = workingDir + pathSeparator + defaultOutputFileName;
+
+        try{
+            if (outputFilePath == null){
+                throw new NullPointerException("Provided Filename was null");
+            }
+
+            String path = workingDir + pathSeparator + outputFilePath;
+            outputJson = new File(path);
+
+        } catch (NullPointerException e) {
+            //TODO: Log errors to separate file
+            System.out.println("No output filename was provided or the provided " +
+                    "filename resulted in a null filepath\n" +
+                    "Setting to default filename: " + defaultOutputFileName );
+            outputJson = new File(defaultPath);
+        }
+
+        try{
+            if (outputJson.exists()){
+                outputJson.delete();
+            }
+            outputJson.createNewFile();
+        } catch (IOException e) {
+            System.out.println("Error creating output file: ");
+            e.printStackTrace();
+            System.out.println("Aborting!");
+            //We can't really continue if we can't write the output file either
+            System.exit(1);
+        }
+
+        return outputJson;
     }
 
 
